@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090b16">
+  <title>Прайс-лист — звёзды, соцсети и бот</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090b16;
+      --text: #f5f6ff;
+      --muted: #a6abc7;
+      --line: rgba(255, 255, 255, .13);
+      --glass: rgba(24, 27, 49, .55);
+      --purple: #aa85ff;
+      --cyan: #69e4ff;
+      --pink: #ff8ed7;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      overflow-x: hidden;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(117, 77, 226, .28), transparent 35%),
+        radial-gradient(circle at 88% 28%, rgba(40, 181, 220, .17), transparent 32%),
+        radial-gradient(circle at 55% 90%, rgba(215, 67, 160, .15), transparent 38%),
+        #090b16;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .25;
+      background-image: radial-gradient(rgba(255,255,255,.65) .7px, transparent .7px);
+      background-size: 30px 30px;
+      mask-image: linear-gradient(to bottom, black, transparent 95%);
+    }
+
+    a { color: inherit; }
+
+    .page {
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 56px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+
+    .brand-icon {
+      display: grid;
+      width: 39px;
+      height: 39px;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.23);
+      border-radius: 13px;
+      background: linear-gradient(135deg, rgba(160,125,255,.38), rgba(80,209,255,.14));
+      box-shadow: 0 0 26px rgba(146,105,255,.22);
+    }
+
+    .top-label,
+    .eyebrow {
+      color: var(--cyan);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .17em;
+      text-transform: uppercase;
+    }
+
+    .top-label {
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.045);
+    }
+
+    .hero {
+      position: relative;
+      max-width: 760px;
+      margin-bottom: 42px;
+    }
+
+    .hero h1 {
+      margin: 13px 0 16px;
+      font-size: clamp(42px, 8vw, 82px);
+      line-height: .99;
+      letter-spacing: -.065em;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(100deg, #fff, #c8b2ff 55%, #77e7ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      max-width: 580px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(15px, 2vw, 18px);
+      line-height: 1.65;
+    }
+
+    .floating-emoji {
+      position: absolute;
+      right: 9%;
+      top: 8%;
+      font-size: 52px;
+      filter: drop-shadow(0 0 20px rgba(255, 202, 89, .4));
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      position: relative;
+      grid-column: span 6;
+      overflow: hidden;
+      min-height: 250px;
+      padding: 27px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: var(--glass);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      box-shadow: 0 20px 60px rgba(0,0,0,.17), inset 0 1px rgba(255,255,255,.08);
+      transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(185, 160, 255, .35);
+      box-shadow: 0 28px 70px rgba(0,0,0,.24), 0 0 35px rgba(143, 106, 255, .08);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      width: 190px;
+      height: 190px;
+      right: -80px;
+      top: -90px;
+      border-radius: 50%;
+      background: var(--glow, rgba(167,127,255,.16));
+      filter: blur(36px);
+      pointer-events: none;
+    }
+
+    .card-wide { grid-column: span 12; }
+
+    .card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 23px;
+    }
+
+    .card h2 {
+      margin: 7px 0 0;
+      font-size: clamp(21px, 3vw, 27px);
+      letter-spacing: -.035em;
+    }
+
+    .emoji {
+      display: grid;
+      flex: 0 0 auto;
+      width: 51px;
+      height: 51px;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 17px;
+      background: rgba(255,255,255,.07);
+      font-size: 25px;
+      animation: bob 3.6s ease-in-out infinite;
+    }
+
+    .card:nth-child(2) .emoji { animation-delay: -.8s; }
+    .card:nth-child(3) .emoji { animation-delay: -1.6s; }
+    .card:nth-child(4) .emoji { animation-delay: -2.4s; }
+
+    .price {
+      margin: 5px 0;
+      font-size: clamp(33px, 4vw, 47px);
+      font-weight: 850;
+      letter-spacing: -.055em;
+    }
+
+    .price small {
+      color: var(--muted);
+      font-size: 17px;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+
+    .note {
+      margin: 13px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .list li,
+    .service {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 15px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      background: rgba(255,255,255,.045);
+    }
+
+    .list strong {
+      flex: 0 0 auto;
+      color: #ddd0ff;
+      font-size: 16px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 8px 11px;
+      border: 1px solid rgba(105,228,255,.22);
+      border-radius: 10px;
+      background: rgba(105,228,255,.08);
+      color: #a0efff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .service {
+      justify-content: flex-start;
+      line-height: 1.45;
+    }
+
+    .service span:first-child {
+      flex: 0 0 24px;
+      font-size: 20px;
+    }
+
+    .service strong {
+      color: #e5ddff;
+    }
+
+    .bot-price {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .bot-price b {
+      padding: 11px 14px;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 13px;
+      background: rgba(255,255,255,.055);
+    }
+
+    .bot-price > span { color: var(--muted); }
+
+    .benefits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .benefits span {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(125, 228, 193, .09);
+      color: #a9f4d9;
+      font-size: 13px;
+    }
+
+    .footer {
+      margin-top: 22px;
+      padding: 18px 4px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .footer strong { color: var(--text); }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-10deg); }
+      50% { transform: translateY(-16px) rotate(8deg); }
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0) rotate(-4deg); }
+      50% { transform: translateY(-7px) rotate(6deg); }
+    }
+
+    @media (max-width: 720px) {
+      .topbar { margin-bottom: 44px; }
+      .hero { margin-bottom: 30px; }
+      .floating-emoji { right: 2%; top: -5px; font-size: 36px; opacity: .7; }
+      .card, .card-wide { grid-column: span 12; }
+      .card { min-height: auto; padding: 22px; }
+      .services { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">✦</span>
+        <span>Digital Market</span>
+      </div>
+      <span class="top-label">Прайс-лист</span>
+    </header>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div class="eyebrow">Звёзды • соцсети • бот</div>
+      <h1 id="page-title">Всё нужное —<br><span>в одном месте.</span></h1>
+      <p>Выбирайте услугу и уточняйте детали в личных сообщениях или канале.</p>
+      <span class="floating-emoji" aria-hidden="true">✨</span>
+    </section>
+
+    <div class="grid">
+      <section class="card" style="--glow: rgba(255, 202, 85, .19);">
+        <div class="card-head">
+          <div>
+            <div class="eyebrow">01 / Telegram</div>
+            <h2>Telegram Stars</h2>
+          </div>
+          <span class="emoji" aria-hidden="true">⭐</span>
+        </div>
+
+        <p class="note">Пополнение звёзд</p>
+        <div class="price">1,35 ₽ <small>/ ⭐</small></div>
+        <span class="tag">Стоимость за одну звезду</span>
+      </section>
+
+      <section class="card" style="--glow: rgba(175, 124, 255, .19);">
+        <div class="card-head">
+          <div>
+            <div class="eyebrow">02 / Услуги</div>
+            <h2>Накрутка</h2>
+          </div>
+          <span class="emoji" aria-hidden="true">🚀</span>
+        </div>
+
+        <ul class="list">
+          <li><span>200 подписчиков</span><strong>40</strong></li>
+          <li><span>500 подписчиков</span><strong>100</strong></li>
+          <li><span>100 просмотров</span><strong>25</strong></li>
+          <li><span>100 реакций</span><strong>50</strong></li>
+        </ul>
+        <p class="note">Оплата в звёздах или рублях — 1:1. Остальные услуги уточняйте в соцсетях.</p>
+      </section>
+
+      <section class="card card-wide" style="--glow: rgba(71, 208, 244, .16);">
+        <div class="card-head">
+          <div>
+            <div class="eyebrow">03 / Площадки</div>
+            <h2>Раскрутка соцсетей</h2>
+          </div>
+          <span class="emoji" aria-hidden="true">📈</span>
+        </div>
+
+        <div class="services">
+          <div class="service"><span>✈️</span><span><strong>Telegram:</strong> подписчики, реакции, просмотры</span></div>
+          <div class="service"><span>💙</span><span><strong>VK:</strong> просмотры постов и видео, лайки</span></div>
+          <div class="service"><span>🎵</span><span><strong>TikTok:</strong> просмотры, лайки</span></div>
+          <div class="service"><span>📸</span><span><strong>Instagram:</strong> лайки, просмотры</span></div>
+          <div class="service"><span>▶️</span><span><strong>YouTube:</strong> лайки, просмотры</span></div>
+        </div>
+
+        <p class="note">Полные прайсы — в личных сообщениях или канале.</p>
+      </section>
+
+      <section class="card card-wide" style="--glow: rgba(246, 99, 190, .15);">
+        <div class="card-head">
+          <div>
+            <div class="eyebrow">04 / Автоматизация</div>
+            <h2>Бот для накрутки</h2>
+          </div>
+          <span class="emoji" aria-hidden="true">🤖</span>
+        </div>
+
+        <div class="bot-price">
+          <b>1 NFT-подарок</b>
+          <span>или</span>
+          <b>400 ⭐</b>
+        </div>
+
+        <div class="benefits">
+          <span>✨ Бесплатная накрутка</span>
+          <span>🔓 Без подписок</span>
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <strong>Нужна другая услуга?</strong> Уточняйте доступность и стоимость в соцсетях.
+    </footer>
+  </main>
+</body>
+</html>
